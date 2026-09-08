@@ -1,0 +1,739 @@
+{
+  "info": {
+    "name": "HostelHub API",
+    "description": "Complete HostelHub API collection. One folder per service.\n\nEnvironment variables:\n- {{baseUrl}} = http://localhost:8080 (via api-gateway)\n- {{gatewayUrl}} = http://localhost:8080\n- {{token}} = JWT access token (auto-populated by Login request)\n- {{studentId}} = UUID of registered student (auto-populated by Register/Login)\n- {{wardenId}} = UUID of created warden (set manually after Create Warden)\n- {{hostelId}} = UUID of created hostel (auto-populated by Create Hostel)\n- {{roomId}} = UUID of created room (auto-populated by Create Room)\n- {{bedId}} = UUID of created bed (auto-populated by Create Bed)\n- {{allocationId}} = UUID of allocation (auto-populated by Create Allocation)\n- {{complaintId}} = UUID of complaint (auto-populated by File Complaint)\n- {{leaveId}} = UUID of leave (auto-populated by Apply for Leave)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080", "type": "string" },
+    { "key": "gatewayUrl", "value": "http://localhost:8080", "type": "string" },
+    { "key": "token", "value": "", "type": "string" },
+    { "key": "studentId", "value": "", "type": "string" },
+    { "key": "wardenId", "value": "", "type": "string" },
+    { "key": "hostelId", "value": "", "type": "string" },
+    { "key": "roomId", "value": "", "type": "string" },
+    { "key": "bedId", "value": "", "type": "string" },
+    { "key": "allocationId", "value": "", "type": "string" },
+    { "key": "complaintId", "value": "", "type": "string" },
+    { "key": "leaveId", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "identity-service",
+      "description": "User registration, login, JWT management. Port 8081, routed via gateway at /api/auth/**",
+      "item": [
+        {
+          "name": "Register Student",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.accessToken) { pm.collectionVariables.set('token', jsonData.accessToken); }",
+                  "if (jsonData.user && jsonData.user.id) { pm.collectionVariables.set('studentId', jsonData.user.id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Priya\",\n  \"lastName\": \"Sharma\",\n  \"email\": \"priya.sharma@example.com\",\n  \"password\": \"securePass1\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.accessToken) { pm.collectionVariables.set('token', jsonData.accessToken); }",
+                  "if (jsonData.user && jsonData.user.id) { pm.collectionVariables.set('studentId', jsonData.user.id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"priya.sharma@example.com\",\n  \"password\": \"securePass1\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"PASTE_REFRESH_TOKEN_HERE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/refresh",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "refresh"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"PASTE_REFRESH_TOKEN_HERE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "logout"]
+            }
+          }
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "me"]
+            }
+          }
+        },
+        {
+          "name": "Create Warden (ADMIN only — currently open)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Rajesh\",\n  \"lastName\": \"Kumar\",\n  \"email\": \"rajesh.kumar@hostel.edu\",\n  \"password\": \"wardenPass1\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/admin/wardens",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "admin", "wardens"]
+            }
+          }
+        },
+        {
+          "name": "Create Admin (ADMIN only — currently open)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Sunita\",\n  \"lastName\": \"Patil\",\n  \"email\": \"sunita.patil@hostel.edu\",\n  \"password\": \"adminPass1\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/admin/admins",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "admin", "admins"]
+            }
+          }
+        },
+        {
+          "name": "Internal — Get User by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/internal/users/{{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "internal", "users", "{{studentId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "hostel-service",
+      "description": "Hostels, rooms, beds. Port 8092, routed via gateway at /api/hostels/**\nNo auth enforced on any endpoint today.",
+      "item": [
+        {
+          "name": "Create Hostel",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) { pm.collectionVariables.set('hostelId', jsonData.id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Girls Hostel Block A\",\n  \"description\": \"Ground floor wing, AC rooms\",\n  \"type\": \"GIRLS\",\n  \"status\": \"ACTIVE\",\n  \"address\": \"Campus Road, Block A\",\n  \"city\": \"Pune\",\n  \"state\": \"Maharashtra\",\n  \"pincode\": \"411001\",\n  \"totalFloors\": 4,\n  \"adminId\": \"{{studentId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/hostels",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "hostels"]
+            }
+          }
+        },
+        {
+          "name": "Get Hostel by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/hostels/{{hostelId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "hostels", "{{hostelId}}"]
+            }
+          }
+        },
+        {
+          "name": "Search Hostels",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/hostels?search=Girls&city=Pune&type=GIRLS&status=ACTIVE",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "hostels"],
+              "query": [
+                { "key": "search", "value": "Girls" },
+                { "key": "city", "value": "Pune" },
+                { "key": "type", "value": "GIRLS" },
+                { "key": "status", "value": "ACTIVE" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Hostel",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Girls Hostel Block A (Renovated)\",\n  \"status\": \"ACTIVE\",\n  \"totalFloors\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/hostels/{{hostelId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "hostels", "{{hostelId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Hostel",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/hostels/{{hostelId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "hostels", "{{hostelId}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Room",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) { pm.collectionVariables.set('roomId', jsonData.id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomNumber\": \"101\",\n  \"floor\": 1,\n  \"type\": \"DOUBLE\",\n  \"capacity\": 2,\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/hostels/{{hostelId}}/rooms",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "hostels", "{{hostelId}}", "rooms"]
+            }
+          }
+        },
+        {
+          "name": "List Rooms in Hostel",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/hostels/{{hostelId}}/rooms?status=ACTIVE",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "hostels", "{{hostelId}}", "rooms"],
+              "query": [{ "key": "status", "value": "ACTIVE" }]
+            }
+          }
+        },
+        {
+          "name": "Get Room by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/hostels/{{hostelId}}/rooms/{{roomId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "hostels", "{{hostelId}}", "rooms", "{{roomId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Room",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/hostels/{{hostelId}}/rooms/{{roomId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "hostels", "{{hostelId}}", "rooms", "{{roomId}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Bed",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) { pm.collectionVariables.set('bedId', jsonData.id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bedNumber\": \"A\",\n  \"status\": \"AVAILABLE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/hostels/{{hostelId}}/rooms/{{roomId}}/beds",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "hostels", "{{hostelId}}", "rooms", "{{roomId}}", "beds"]
+            }
+          }
+        },
+        {
+          "name": "List Beds in Room",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/hostels/{{hostelId}}/rooms/{{roomId}}/beds?status=AVAILABLE",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "hostels", "{{hostelId}}", "rooms", "{{roomId}}", "beds"],
+              "query": [{ "key": "status", "value": "AVAILABLE" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "allocation-service",
+      "description": "Bed allocation lifecycle (check-in / check-out). Port 8093, routed via gateway at /api/allocations/**\nNo auth enforced today.",
+      "item": [
+        {
+          "name": "Create Allocation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) { pm.collectionVariables.set('allocationId', jsonData.id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": \"{{studentId}}\",\n  \"bedId\": \"{{bedId}}\",\n  \"remarks\": \"New intake 2026\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/allocations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "allocations"]
+            }
+          }
+        },
+        {
+          "name": "Get Allocation by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/allocations/{{allocationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "allocations", "{{allocationId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Student Allocations",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/allocations/student/{{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "allocations", "student", "{{studentId}}"]
+            }
+          }
+        },
+        {
+          "name": "Checkout (Check Student Out)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/allocations/{{allocationId}}/checkout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "allocations", "{{allocationId}}", "checkout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "complaint-service",
+      "description": "Complaint filing and lifecycle. Port 8094, routed via gateway at /api/complaints/**\nAuth via UUID query param only — impersonation possible today.",
+      "item": [
+        {
+          "name": "File Complaint",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) { pm.collectionVariables.set('complaintId', jsonData.id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"PLUMBING\",\n  \"title\": \"Leaking tap in bathroom\",\n  \"description\": \"The cold water tap in bathroom 2 has been leaking for 3 days.\",\n  \"priority\": \"HIGH\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/complaints?studentId={{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "complaints"],
+              "query": [{ "key": "studentId", "value": "{{studentId}}" }]
+            }
+          }
+        },
+        {
+          "name": "Get Complaint by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/complaints/{{complaintId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "complaints", "{{complaintId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Student Complaints",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/complaints/student/{{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "complaints", "student", "{{studentId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get All Complaints (optional status filter)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/complaints?status=OPEN",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "complaints"],
+              "query": [{ "key": "status", "value": "OPEN", "description": "Optional. Values: OPEN, IN_PROGRESS, RESOLVED, REJECTED" }]
+            }
+          }
+        },
+        {
+          "name": "Update Complaint (student, OPEN only)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Leaking tap — now flooding\",\n  \"description\": \"Water is now pooling on the floor. Urgent.\",\n  \"priority\": \"HIGH\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/complaints/{{complaintId}}?studentId={{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "complaints", "{{complaintId}}"],
+              "query": [{ "key": "studentId", "value": "{{studentId}}" }]
+            }
+          }
+        },
+        {
+          "name": "Update Complaint Status (warden)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"IN_PROGRESS\",\n  \"resolutionRemarks\": \"Plumber dispatched, expected fix in 2 hours\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/complaints/{{complaintId}}/status?wardenId={{wardenId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "complaints", "{{complaintId}}", "status"],
+              "query": [{ "key": "wardenId", "value": "{{wardenId}}" }]
+            }
+          }
+        },
+        {
+          "name": "Delete Complaint (student, OPEN only)",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/complaints/{{complaintId}}?studentId={{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "complaints", "{{complaintId}}"],
+              "query": [{ "key": "studentId", "value": "{{studentId}}" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "leave-service",
+      "description": "Student leave request lifecycle. Port 8095, routed via gateway at /api/leaves/**\nAuth via UUID query param only. Optimistic locking on accept via @Version.",
+      "item": [
+        {
+          "name": "Apply for Leave",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) { pm.collectionVariables.set('leaveId', jsonData.id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startDate\": \"2026-09-05\",\n  \"endDate\": \"2026-09-10\",\n  \"reason\": \"Family function — sister's wedding\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/leaves?studentId={{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "leaves"],
+              "query": [{ "key": "studentId", "value": "{{studentId}}" }]
+            }
+          }
+        },
+        {
+          "name": "Get Leave by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/leaves/{{leaveId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "leaves", "{{leaveId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Student Leaves",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/leaves/student/{{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "leaves", "student", "{{studentId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Hostel Leaves",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/leaves/hostel/{{hostelId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "leaves", "hostel", "{{hostelId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get All Leaves (optional status filter)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/leaves?status=PENDING",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "leaves"],
+              "query": [{ "key": "status", "value": "PENDING", "description": "Optional. Values: PENDING, IN_REVIEW, APPROVED, REJECTED, CANCELLED" }]
+            }
+          }
+        },
+        {
+          "name": "Update Leave (student, PENDING only)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startDate\": \"2026-09-06\",\n  \"endDate\": \"2026-09-11\",\n  \"reason\": \"Wedding extended by one day\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/leaves/{{leaveId}}?studentId={{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "leaves", "{{leaveId}}"],
+              "query": [{ "key": "studentId", "value": "{{studentId}}" }]
+            }
+          }
+        },
+        {
+          "name": "Cancel Leave (student, PENDING only)",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/leaves/{{leaveId}}?studentId={{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "leaves", "{{leaveId}}"],
+              "query": [{ "key": "studentId", "value": "{{studentId}}" }]
+            }
+          }
+        },
+        {
+          "name": "Warden — Accept Leave (PENDING → IN_REVIEW)",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{baseUrl}}/api/leaves/{{leaveId}}/accept?wardenId={{wardenId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "leaves", "{{leaveId}}", "accept"],
+              "query": [{ "key": "wardenId", "value": "{{wardenId}}" }]
+            }
+          }
+        },
+        {
+          "name": "Warden — Approve Leave (IN_REVIEW → APPROVED)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"APPROVED\",\n  \"remarks\": \"Approved for family function. Travel dates verified.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/leaves/{{leaveId}}/status?wardenId={{wardenId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "leaves", "{{leaveId}}", "status"],
+              "query": [{ "key": "wardenId", "value": "{{wardenId}}" }]
+            }
+          }
+        },
+        {
+          "name": "Warden — Reject Leave (IN_REVIEW → REJECTED)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"REJECTED\",\n  \"remarks\": \"Exam period — no leaves approved\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/leaves/{{leaveId}}/status?wardenId={{wardenId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "leaves", "{{leaveId}}", "status"],
+              "query": [{ "key": "wardenId", "value": "{{wardenId}}" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "infrastructure",
+      "description": "Health checks for infrastructure services. Not routed through gateway.",
+      "item": [
+        {
+          "name": "Eureka Dashboard",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:8761", "raw": "http://localhost:8761" }
+          }
+        },
+        {
+          "name": "Config Server Health",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:8888/actuator/health", "raw": "http://localhost:8888/actuator/health" }
+          }
+        },
+        {
+          "name": "Gateway Health",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/actuator/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["actuator", "health"]
+            }
+          }
+        },
+        {
+          "name": "Config — Fetch Allocation Service Properties",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:8888/allocation-service/default", "raw": "http://localhost:8888/allocation-service/default" }
+          }
+        }
+      ]
+    }
+  ]
+}
